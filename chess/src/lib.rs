@@ -40,8 +40,8 @@ pub enum Edgecase {
 // Struct for the pieces.
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Piece {
-    color: Color,
-    rank: Rank,
+    pub color: Color,
+    pub rank: Rank,
     edgecase: Edgecase,
 }
 // Struct for the board.
@@ -59,7 +59,7 @@ pub struct Board {
 
 
 // Creates a null object = Empty, Empty
-static NULLTOKEN: Piece = Piece { 
+pub static NULLTOKEN: Piece = Piece { 
     color: Color::Empty, 
     rank: Rank::Empty,
     edgecase: Edgecase::has_moved,

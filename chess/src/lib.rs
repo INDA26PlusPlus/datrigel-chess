@@ -160,6 +160,8 @@ impl Board {
         let first_char: char = start.chars().nth(0).unwrap().to_ascii_uppercase();
         let second_char: char = start.chars().nth(1).unwrap();
         
+        
+
         // Converts ascci to boardnotation
         let sum = ((first_char as u32) - ('A' as u32) + (((second_char as u32) - ('1' as u32)) * 8)) as usize;
         // to check that no out of bounds inputs are registerd.
@@ -233,7 +235,7 @@ impl Board {
             } 
             // tests move and if move makes king stay in check, invalid.
             else {
-                let board_copy: &mut Board = self;
+                let mut board_copy: Board = self.clone();  
                 board_copy.move_demon(start, dest);
                 if board_copy.is_king_in_check(board_copy.turn_order).len() != 0 {
                     // King still in check
@@ -411,7 +413,7 @@ impl Board {
             }
             if self.check_square(start + next_index) == NULLTOKEN{
                 move_list.push(start + next_index);
-            } else if color != self.check_square(start).color {
+            } else if color != self.check_square(start + next_index).color {
                 move_list.push(start + next_index);
                 break;
             } else {
@@ -427,7 +429,7 @@ impl Board {
             }
             if self.check_square(start + next_index) == NULLTOKEN{
                 move_list.push(start + next_index);
-            } else if color != self.check_square(start).color {
+            } else if color != self.check_square(start + next_index).color {
                 move_list.push(start + next_index);
                 break;
             } else {
@@ -443,7 +445,7 @@ impl Board {
             }
             if self.check_square(start - next_index) == NULLTOKEN{
                 move_list.push(start - next_index);
-            } else if color != self.check_square(start).color {
+            } else if color != self.check_square(start - next_index).color {
                 move_list.push(start - next_index);
                 break;
             } else {
@@ -462,7 +464,7 @@ impl Board {
             }
             if self.check_square(start - next_index) == NULLTOKEN{
                 move_list.push(start - next_index);
-            } else if color != self.check_square(start).color {
+            } else if color != self.check_square(start - next_index).color {
                 move_list.push(start - next_index);
                 break;
             } else {
@@ -581,10 +583,14 @@ impl Board {
                 if (start + next_index) / 8 != start / 8 {
                     break;
                 }
-                if self.check_square(start + next_index) == NULLTOKEN {
-                    continue;
-                } else if self.check_square(start + next_index).rank == Rook && self.check_square(start + next_index).edgecase == no_moved {
-                    move_list.push(start + 2)
+                // Checks if the square is taken
+                if self.check_square(start + next_index) != NULLTOKEN {
+                    // Checks if no pieces are between the king and rook, they are the same color and if the rook has moved
+                    if self.check_square(start + next_index).rank == Rook && self.check_square(start + next_index).edgecase == no_moved && self.check_square(start + next_index).color == self.check_square(start).color {
+                        move_list.push(start + 2)
+                    } else {
+                        break;
+                    }
                 }
             }
             // Left side check
@@ -594,10 +600,13 @@ impl Board {
                 if (start.saturating_sub(next_index) == 0 && start != next_index) || ((start - next_index) / 8 != start / 8) {
                     break;
                 }
-                if self.check_square(start - next_index) == NULLTOKEN {
-                    continue;
-                } else if self.check_square(start - next_index).rank == Rook && self.check_square(start - next_index).edgecase == no_moved {
-                    move_list.push(start - 2)
+                if self.check_square(start - next_index) != NULLTOKEN {
+                    // Checks if no pieces are between the king and rook, they are the same color and if the rook has moved
+                    if self.check_square(start - next_index).rank == Rook && self.check_square(start - next_index).edgecase == no_moved && self.check_square(start - next_index).color == self.check_square(start).color{
+                        move_list.push(start - 2)
+                    } else {
+                        break;
+                    }
                 }
             }
 
@@ -675,7 +684,7 @@ impl Board {
     // Pawn upgrade logic. Applied when wanting to upgrade a given pawn.
     pub fn upgrade_pawn(&mut self, start: usize, rank: Rank) {
         let pawn_piece = self.check_square(start);
-        if pawn_piece.rank == Pawn || rank != Empty || rank != King || rank != Pawn {
+        if pawn_piece.rank == Pawn && rank != Empty && rank != King && rank != Pawn {
             if self.check_square(start).color == Black && start / 8 == 0 {
                 self.set_demon(start, pawn_piece.color, rank, pawn_piece.edgecase);
             } else if self.check_square(start).color == White && start / 8 == 7 {

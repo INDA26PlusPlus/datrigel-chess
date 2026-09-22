@@ -60,3 +60,19 @@ fn upgrade_black_pawn() {
     assert_eq!(gameboard.check_square(4).rank, Queen);
     assert_eq!(gameboard.check_square(4).color, Black);
 }
+
+#[test]
+fn upgrad_fail_black_pawn() {
+    // init boardstate.
+    let mut gameboard = Board::init_board();
+    gameboard.set_demon(12, Black, Pawn, has_moved);
+    // Need to set turn order to black
+    gameboard.turn_order = Black;
+    // castle move with king.
+    gameboard.move_piece(12,4);
+    gameboard.upgrade_pawn(4, King);
+
+    assert_eq!(gameboard.check_square(12), NULLTOKEN);
+    assert_eq!(gameboard.check_square(4).rank, Pawn);
+    assert_eq!(gameboard.check_square(4).color, Black);
+}

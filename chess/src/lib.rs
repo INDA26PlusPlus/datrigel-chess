@@ -233,16 +233,16 @@ impl Board {
                 // gameover.
                 return true;
             } 
-            // tests move and if move makes king stay in check, invalid.
-            else {
-                let mut board_copy: Board = self.clone();  
-                board_copy.move_demon(start, dest);
-                if board_copy.is_king_in_check(board_copy.turn_order).len() != 0 {
-                    // King still in check
-                    return false;
-                }
-            }
         }
+        // tests move and if move makes king stay in check, invalid.
+        let mut board_copy: Board = self.clone();  
+        board_copy.move_demon(start, dest);
+            if board_copy.is_king_in_check(board_copy.turn_order).len() != 0 {
+                // King still in check
+                return false;
+            }
+            
+        
         // Checks if dest_usize is inside of the move_list. If so moves the piece.
         if move_list.contains(&dest) == true {
             self.move_demon(start, dest);
@@ -549,19 +549,19 @@ impl Board {
 
         // Checking if upper right, straight and left can be valid moves.
         for i in 1..=3 {
-            if (start + 6 + i) < 64 && self.check_square(start + 6 + i).color != color {
+            if (start + 6 + i) < 64 && self.check_square(start + 6 + i).color != color && (start / 8) + 1 == (start + 6 + i) / 8{
                 move_list.push(start + 6 + i);
             }
         }
         // Check move left.
         if start.saturating_sub(1) != 0 || start == 1 {
-            if self.check_square(start - 1).color != color {
+            if self.check_square(start - 1).color != color && start / 8 == (start - 1) / 8 {
                 move_list.push(start - 1);
             }
         }
         // Check move right.
         if start + 1 < 64 {
-            if self.check_square(start + 1).color != color {
+            if self.check_square(start + 1).color != color && start / 8 == (start + 1) / 8 {
                 move_list.push(start + 1);
             }
         }
@@ -570,7 +570,7 @@ impl Board {
             if start.saturating_sub(6+i) == 0 && start != 6+i{
                 continue;
             }
-            if self.check_square(start - (6 + i)).color != color{
+            if self.check_square(start - (6 + i)).color != color && (start / 8) - 1 == (start - (6 + i)) / 8 {
                 move_list.push(start - (6 + i));
                 }
         }
